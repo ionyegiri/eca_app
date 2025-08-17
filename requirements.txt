@@ -1,7 +1,7 @@
-streamlit*
-pandas*
-numpy*
-plotly*
-scipy*
-python-docx*
-PyMuPDF*
+streamlit
+pandas
+numpy
+plotly
+scipy
+python-docx
+PyMuPDF
