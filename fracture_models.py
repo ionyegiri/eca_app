@@ -7,7 +7,7 @@ import numpy as np
 from typing import Tuple, List
 from models import (
     PipeGeometry, FlawGeometry, StressStrainCurve, JRCurve,
-    FADOption, DeterministicInputs
+    FADOption, DeterministicInputs, FlawType
 )
 
 # ----------------------------
@@ -118,6 +118,8 @@ def check_recharacterization(flaw: FlawGeometry, rule_ratio: float) -> FlawGeome
     if flaw.ligament is not None and flaw.ligament < rule_ratio * flaw.a:
         new_flaw = flaw.copy()
         new_flaw.flaw_type = FlawGeometry.FlawType.SURFACE_OD
+        reference FlawType enum, not FlawGeometry.FlawType
         new_flaw.ligament = None
         return new_flaw
     return flaw
+
