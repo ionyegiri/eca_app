@@ -102,12 +102,22 @@ def flaw_type_selector(key_prefix: str = "") -> FlawType:
 
 def reeling_events_editor(key_prefix: str = "") -> list:
     st.subheader("Reeling events (optional)")
+
+    # Show guidance in a caption instead of using the 'help=' kwarg
+    st.caption("Axial strain in percent. Add rows as needed.")
+
     df0 = pd.DataFrame([
         {"name": "Reel-on", "axial_strain_%": 1.5, "cycles": 1},
         {"name": "Aligner", "axial_strain_%": 1.0, "cycles": 1},
     ])
-    df = st.data_editor(df0, num_rows="dynamic", key=f"{key_prefix}reel_events",
-                        help="Axial strain in percent. Add rows as needed.")
+
+    # ❗ Removed: help="..."  (older Streamlit versions don’t support this on data_editor)
+    df = st.data_editor(
+        df0,
+        num_rows="dynamic",
+        key=f"{key_prefix}reel_events",
+    )
+
     events = []
     try:
         for _, r in df.iterrows():
@@ -118,6 +128,7 @@ def reeling_events_editor(key_prefix: str = "") -> list:
             })
     except Exception:
         pass
+
     return events
 
 
