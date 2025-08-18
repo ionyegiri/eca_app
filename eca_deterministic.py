@@ -87,14 +87,37 @@ def run_deterministic_eca(inputs: DeterministicInputs) -> Dict:
     YS = inputs.mat_curve.yield_strength()
     flow = inputs.mat_curve.flow_strength()
     Lr = sigma / flow if flow > 0 else 0.0
-    Kr = K_applied / (np.sqrt(J_applied * inputs.youngs_modulus)) if J_applied > 0 else 0.0
-
-    # Check against FAD
+    # ---- NEW: toughness-based Kr ----
+    E_prime = inputs.youngs_modulus / (1.0 - inputs.poisson**2)
+    # Prefer Kmat; if absent, convert Jc to equivalent Kmat
+    if inputs.Kmat is not None:
+        Kmat_eff = float(inputs.Kmat)
+    elif inputs.Jc is not None:
+        Kmat_eff = float(np.sqrt(inputs.Jc * E_prime))
+    else:
+        Kmat_eff = None
+    
+    if Kmat_eff is None:
+        Kr = np.nan
+        note = "EOL toughness (Kmat or Jc) not provided; Kr set to NaN."
+    else:
+        Kr = K_applied / Kmat_eff
+        note = ""
+    
+    # ---- Compare against FAD ----
     fad_Kr_allow = np.interp(Lr, Lr_curve, Kr_curve)
-    passes = Kr <= fad_Kr_allow
-
+    passes = bool(Kr <= fad_Kr_allow)
+    
     return {
         "flaw_evolution": trace,
-        "EOL_check": {"Kr": Kr, "Lr": Lr, "allowable_Kr": fad_Kr_allow, "pass": passes},
-        "FAD": {"Lr": Lr_curve.tolist(), "Kr": Kr_curve.tolist()}
+        "EOL_check": {
+            "Kr": float(Kr),
+            "Lr": float(Lr),
+            "allowable_Kr": float(fad_Kr_allow),
+            "pass": passes,
+            "note": note,
+        },
+        "FAD": {"Lr": Lr_curve.tolist(), "Kr": Kr_curve.tolist()},
     }
+
+
