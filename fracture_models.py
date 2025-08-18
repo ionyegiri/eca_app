@@ -60,7 +60,8 @@ def calc_K_surface(pipe: PipeGeometry, flaw: FlawGeometry, sigma: float) -> floa
     a = flaw.a / 1000.0  # mm -> m
     Q = 1.0 + 1.464 * (flaw.a / flaw.c)**1.65
     beta = 1.12  # shape factor approx
-    return beta * sigma * np.sqrt(np.pi * a / 1000.0) * np.sqrt(Q)
+    return beta * sigma * np.sqrt(np.pi * a) * np.sqrt(Q)
+    #return beta * sigma * np.sqrt(np.pi * a / 1000.0) * np.sqrt(Q)
 
 
 def calc_K_embedded(pipe: PipeGeometry, flaw: FlawGeometry, sigma: float) -> float:
@@ -69,7 +70,8 @@ def calc_K_embedded(pipe: PipeGeometry, flaw: FlawGeometry, sigma: float) -> flo
     """
     a = flaw.a / 1000.0
     beta = 1.0
-    return beta * sigma * np.sqrt(np.pi * a / 1000.0)
+    return beta * sigma * np.sqrt(np.pi * a)
+    #return beta * sigma * np.sqrt(np.pi * a / 1000.0)
 
 
 # ----------------------------
