@@ -178,6 +178,22 @@ class DeterministicInputs:
     youngs_modulus: float = 207000.0  # MPa
     tearing_limit_fraction_t: float = 0.10  # default 10% WT (configurable)
     rechar_rule_ligament_over_a: float = 0.5  # default 0.5 a for embedded->surface
+
+    # NEW (optional toughness inputs for EOL check):
+    Kmat: Optional[float] = None   # MPa√m
+    Jc: Optional[float] = None     # N/mm (kJ/m^2)
+    
+# Optional helper (handy in engines/UI)
+    def equivalent_Kmat(self) -> Optional[float]:
+        """Return Kmat (MPa√m) using Jc if Kmat is not set; else return Kmat."""
+        import numpy as np
+        if self.Kmat is not None:
+            return float(self.Kmat)
+        if self.Jc is not None:
+            E_prime = self.youngs_modulus / max(1.0 - self.poisson**2, 1e-9)
+            return float(np.sqrt(self.Jc * E_prime))
+        return None
+
 # ----------------------------
 # Probabilistic inputs
 # ----------------------------
@@ -227,3 +243,4 @@ class ProbabilisticInputs:
     rv_fcgr_m: Optional[RandomVar] = None
     # deterministic context needed by the engine
     base: DeterministicInputs = field(default_factory=DeterministicInputs)
+
